@@ -1,0 +1,649 @@
+--Name:Prudhvi Krishna Narra
+--CWID: 200 54 101
+--Date:4/25/2014
+
+
+-- Table: brand
+
+CREATE TABLE brand
+(
+  pk_brand_id integer NOT NULL,
+  name character varying(255) NOT NULL,
+  CONSTRAINT brand_pkey PRIMARY KEY (pk_brand_id)
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+-- Table: colour
+
+
+
+CREATE TABLE colour
+(
+  pk_colour_id integer NOT NULL,
+  description character varying(255) NOT NULL,
+  alfanumeric character varying(255),
+  CONSTRAINT colour_pkey PRIMARY KEY (pk_colour_id)
+)
+WITH (
+  OIDS=FALSE
+);
+
+-- Table: country
+
+
+
+CREATE TABLE country
+(
+  pk_country_id integer NOT NULL,
+  name character varying(255) NOT NULL,
+  principal_currency character varying(255) NOT NULL,
+  CONSTRAINT country_pkey PRIMARY KEY (pk_country_id)
+)
+WITH (
+  OIDS=FALSE
+);
+
+-- Table: job_type
+
+
+
+CREATE TABLE job_type
+(
+  pk_job_type_id integer NOT NULL,
+  description character varying(255) NOT NULL,
+  salary double precision NOT NULL,
+  CONSTRAINT job_type_pkey PRIMARY KEY (pk_job_type_id)
+)
+WITH (
+  OIDS=FALSE
+);
+
+-- Table: outlet
+
+
+
+CREATE TABLE outlet
+(
+  pk_outlet_id integer NOT NULL,
+  fk_country_id integer NOT NULL,
+  address character varying(255) NOT NULL,
+  CONSTRAINT outlet_pkey PRIMARY KEY (pk_outlet_id),
+  CONSTRAINT outlet_fk_country_id_fkey FOREIGN KEY (fk_country_id)
+      REFERENCES country (pk_country_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+-- Table: people
+
+
+
+CREATE TABLE people
+(
+  pk_people_id integer NOT NULL,
+  fullname character varying(255) NOT NULL,
+  email character varying(255),
+  gender character varying(1) NOT NULL,
+  birth_date date NOT NULL,
+  phone character varying(25) NOT NULL,
+  CONSTRAINT "PEOPLE_pkey" PRIMARY KEY (pk_people_id)
+)
+WITH (
+  OIDS=FALSE
+);
+
+-- Table: staff
+
+
+
+CREATE TABLE staff
+(
+  pk_staff_id integer NOT NULL,
+  fk_people_id integer NOT NULL,
+  fk_job_type_id integer NOT NULL,
+  employed character varying(255) NOT NULL,
+  CONSTRAINT staff_pkey PRIMARY KEY (pk_staff_id),
+  CONSTRAINT staff_fk_job_type_id_fkey FOREIGN KEY (fk_job_type_id)
+      REFERENCES job_type (pk_job_type_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT staff_fk_people_id_fkey FOREIGN KEY (fk_people_id)
+      REFERENCES people (pk_people_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+
+-- Table: vehicule_category
+
+
+CREATE TABLE vehicule_category
+(
+  pk_vehichule_category_id integer NOT NULL,
+  name character varying(255) NOT NULL,
+  doors_number integer NOT NULL,
+  CONSTRAINT vehicule_category_pkey PRIMARY KEY (pk_vehichule_category_id)
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+-- Table: vehicule_model
+
+
+
+CREATE TABLE vehicule_model
+(
+  pk_vehicule_model_id integer NOT NULL,
+  fk_brand_id integer NOT NULL,
+  name character varying(255),
+  CONSTRAINT vehicule_model_pkey PRIMARY KEY (pk_vehicule_model_id),
+  CONSTRAINT vehicule_model_fk_brand_id_fkey FOREIGN KEY (fk_brand_id)
+      REFERENCES brand (pk_brand_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+-- Table: vehicule_category_model
+
+
+
+CREATE TABLE vehicule_category_model
+(
+  pk_vehicule_category_model_id integer NOT NULL,
+  fk_vehicule_category_id integer NOT NULL,
+  fk_vehicule_model_id integer NOT NULL,
+  motor character varying(255) NOT NULL,
+  windows character varying(255) NOT NULL,
+  seats character varying(255) NOT NULL,
+  fabrication_year date NOT NULL,
+  CONSTRAINT vehicule_category_model_pkey PRIMARY KEY (pk_vehicule_category_model_id),
+  CONSTRAINT vehicule_category_model_fk_vehicule_category_id_fkey FOREIGN KEY (fk_vehicule_category_id)
+      REFERENCES vehicule_category (pk_vehichule_category_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT vehicule_category_model_fk_vehicule_model_id_fkey FOREIGN KEY (fk_vehicule_model_id)
+      REFERENCES vehicule_model (pk_vehicule_model_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+
+
+-- Table: vehicule
+
+
+
+CREATE TABLE vehicule
+(
+  pk_vehicule_id integer NOT NULL,
+  fk_colour_id integer NOT NULL,
+  fk_vehicule_category_model_id integer NOT NULL,
+  transmission character varying(255) NOT NULL,
+  price double precision NOT NULL,
+  availables integer NOT NULL,
+  CONSTRAINT vehicule_pkey PRIMARY KEY (pk_vehicule_id),
+  CONSTRAINT vehicule_fk_colour_id_fkey FOREIGN KEY (fk_colour_id)
+      REFERENCES colour (pk_colour_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT vehicule_fk_vehicule_category_model_id_fkey FOREIGN KEY (fk_vehicule_category_model_id)
+      REFERENCES vehicule_category_model (pk_vehicule_category_model_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+
+-- Table: sale
+
+
+					
+CREATE TABLE sale
+(
+  pk_sale_id integer NOT NULL,
+  fk_outlet_id integer NOT NULL,
+  fk_staff_id integer NOT NULL,
+  fk_vehicule_id integer NOT NULL,
+  total_units integer NOT NULL,
+  sale_total double precision NOT NULL,
+  sale_date date NOT NULL,
+  comments character varying(255),
+  CONSTRAINT sale_pkey PRIMARY KEY (pk_sale_id),
+  CONSTRAINT sale_fk_outlet_id_fkey FOREIGN KEY (fk_outlet_id)
+      REFERENCES outlet (pk_outlet_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT sale_fk_staff_id_fkey FOREIGN KEY (fk_staff_id)
+      REFERENCES staff (pk_staff_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT sale_fk_vehicule_id_fkey FOREIGN KEY (fk_vehicule_id)
+      REFERENCES vehicule (pk_vehicule_id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+
+--Insert statements
+
+--brand table
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (5,'honda');
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (2,'hyundai');
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (1,'ford');
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (8,'mitsubishi');
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (7,'jeep');
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (55,'mazda');
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (233,'kia');
+INSERT INTO brand(
+            pk_brand_id, name)
+    VALUES (12345,'renault');
+
+-- color table
+
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (1,'purple','');
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (25,'black','');
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (9,'gray','');
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (78,'blue','1806E6');
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (4,'green','06E620');
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (6,'orange','F8620B');
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (5,'brown','662703');
+INSERT INTO colour(
+            pk_colour_id, description, alfanumeric)
+    VALUES (3,'yellow','F7F413');  
+
+--country table
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (5,'venezuela','VEF');
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (55,'united states','USD');
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (6,'mexico','MXN');
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (2,'chile','CLP');
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (9,'canada','CAD');
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (222,'japon','JPY');
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (12,'australia','AUD');
+INSERT INTO country(
+            pk_country_id, name, principal_currency)
+    VALUES (4,'italia','EUR');
+
+--job type
+
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (5,'auditor ',4567); 
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (6,'driver',2500);
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (7,'manager',5000);
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (4,'director',4500);
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (2,'treasurer',3000);
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (1,'secretary',2500);
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (8,'programmer',4500);
+INSERT INTO job_type(
+            pk_job_type_id, description, salary)
+    VALUES (3,'seller',3500); 
+
+--outlet table
+
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (3,2,'santiago de chile');
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (77,4,'rome');
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (5,6,'toronto');
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (12,12,'sydney');
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (8,55,'new york');
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (11,222,'tokyo');
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (2,5,'caracas');
+INSERT INTO outlet(
+            pk_outlet_id, fk_country_id, address)
+    VALUES (7,5,'maracaibo');
+
+--people table
+
+INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648899,'gabriela sofia palacios de palacios','gaby@gmail.com','f','1976-10-13','888888888');
+INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648897,'jose martinez','jose@email.com','m','1967-10-13','875534424');
+INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648895,'monica alberta spears','mnic@yahoo.es','f','1985-04-22','124143535');
+INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648888,'jhon apple','japp@hotmail.com','m','1953-01-24','424242445');
+ INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648891,'ismael ramirez','','m','1980-09-13','042453535');
+INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648892,'robert de niro','deniro@hotmail.es','m','1988-03-22','232414124');
+INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648881,'jennifer lopez','jlo@gmail.com','f','1990-08-22','213214214');
+INSERT INTO people(
+            pk_people_id, fullname, email, gender, birth_date, phone)
+    VALUES (19648884,'daniel dehrs','dani11@gmail.com','m','1973-09-13','213124124');
+
+--staff table
+
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (24,19648899,3,'2009-06-15');
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (34,19648895,6,'2005-07-15');
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (99,19648888,7,'2010-03-11');
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (53,19648884,8,'2012-01-22');
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (10,19648892,4,'2010-09-13');
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (23,19648881,3,'2010-04-18');
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (9,19648891,3,'2012-11-11');
+INSERT INTO staff(
+            pk_staff_id, fk_people_id, fk_job_type_id, employed)
+    VALUES (77,19648897,3,'2011-07-20');
+
+--vehicle category
+
+INSERT INTO vehicule_category(
+            pk_vehichule_category_id, name, doors_number)
+    VALUES (4,'road',0);
+ INSERT INTO vehicule_category(
+            pk_vehichule_category_id, name, doors_number)
+    VALUES (77,'van',4);
+INSERT INTO vehicule_category(
+            pk_vehichule_category_id, name, doors_number)
+    VALUES (3,'sport',2);
+INSERT INTO vehicule_category(
+            pk_vehichule_category_id, name, doors_number)
+    VALUES (5,'pickup',4);
+INSERT INTO vehicule_category(
+            pk_vehichule_category_id, name, doors_number)
+    VALUES (7,'pickup',2);
+
+--vehicle model
+
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (25,1,'fiesta');
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (23,1,'laser');  
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (7,7,'grand cherokee');
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (8,55,'BT-50 4x2 2.2L'); 
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (2,233,'optima');
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (222,5,'civic'); 
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (1,8,'lancer');
+INSERT INTO vehicule_model(
+            pk_vehicule_model_id, fk_brand_id, name)
+    VALUES (13,2,'grace'); 
+
+
+--vehicle category model
+
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (6,5,8,'v-tec 3.4','manual','nylon','2000-03-02');
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (1,3,23,'ecotec 1.8','automatic','leather','2000-01-01');
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (8,77,13,'hemi 3.4','manual','leather','2003-11-15');
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (11,4,7,'hemi 3.4','automatic','nylon','2005-12-01');
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (88,3,25,'ectoec 1.8','manual','leather','2002-08-11');
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (20,7,2,'hemi 3.4','automatic','leather','2010-07-15');
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (4,3,1,'v-tec 2.4','automatic','leather','2003-01-01');
+INSERT INTO vehicule_category_model(
+            pk_vehicule_category_model_id, fk_vehicule_category_id, fk_vehicule_model_id, 
+            motor, windows, seats, fabrication_year)
+    VALUES (3,3,2,'ecotec 1.8','manual','nylon','2005-04-14');
+
+
+
+--vehicle table
+
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (1,3,1,'manual',5000,5);
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (2,5,4,'automatic',5000,8);
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (3,6,8,'automatic',7000,7);
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (4,25,88,'manual',4500,4);
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (5,78,11,'manual',5500,3);
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (7,4,6,'manual',4250,2);
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (8,1,3,'manual',3000,1);
+INSERT INTO vehicule(
+            pk_vehicule_id, fk_colour_id, fk_vehicule_category_model_id, 
+            transmission, price, availables)
+    VALUES (6,9,11,'automatic',6000,8);
+
+--sale table
+
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (10,3,9,3,2,14000,'2013-02-02','good sell');
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (11,7,23,1,1,5000,'2012-09-13','good sell');
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (12,7,23,5,2,11000,'2012-09-14','good sell');
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (14,12,77,6,4,24000,'2013-03-04','');
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (15,8,9,2,1,5000,'2012-03-01','');
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (13,77,24,8,1,3000,'2011-09-11','');
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (16,5,24,4,3,13500,'2011-01-01','');
+INSERT INTO sale(
+            pk_sale_id, fk_outlet_id, fk_staff_id, fk_vehicule_id, total_units, 
+            sale_total, sale_date, comments)
+    VALUES (17,2,77,7,1,4250,'2013-01-01','');
+
+
+
+
+
+--trigger functions
+
+--update cars on sales
+
+CREATE OR REPLACE FUNCTION update_cars_on_sales()
+  RETURNS trigger AS
+$BODY$
+    BEGIN
+        IF(NEW.total_units>(select availables from vehicule 
+        where pk_vehicule_id = NEW.fk_vehicule_id)) THEN
+        raise exception 'THERES NOT SO MUCH VEHICULES LEFT';
+        ELSE
+        update vehicule set availables = (availables - NEW.total_units) 
+        where NEW.fk_vehicule_id = pk_vehicule_id;
+        END IF;
+        return new;
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+-- update cars on sales after delete
+
+CREATE OR REPLACE FUNCTION update_cars_on_sales_after_delete()
+  RETURNS trigger AS
+$BODY$
+    BEGIN
+        update vehicule set availables = (availables + old.total_units) 
+        where old.fk_vehicule_id = pk_vehicule_id;
+        return old;
+    END;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+
+-- View: vehicle_specifications
+
+
+CREATE OR REPLACE VIEW vehicle_specifications AS 
+ SELECT vm.name,
+    v1.motor,
+    v1.windows,
+    v1.seats,
+    s.comments,
+    c.description
+   FROM vehicule_model vm
+   JOIN vehicule_category_model v1 ON vm.pk_vehicule_model_id = v1.fk_vehicule_model_id
+   JOIN vehicule v ON v1.pk_vehicule_category_model_id = v.fk_vehicule_category_model_id
+   JOIN sale s ON v.pk_vehicule_id = s.fk_vehicule_id
+   JOIN colour c ON c.pk_colour_id = v.fk_colour_id;
+
+
+--Select statements
+select * from brand;
+select * from colour;
+select * from country;
+select * from job_type;
+select * from outlet;
+select * from people;
+select * from staff;
+select * from sale;
+select * from vehicule;
+select * from vehicule_category;
+select * from vehicule_category_model;
+select * from vehicule_model;
